@@ -2,7 +2,21 @@
 
 namespace App\Models;
 
-class Card
+use Illuminate\Database\Eloquent\Model;
+
+class Card extends Model
 {
+    protected $table = 'CARD';
+    protected $primaryKey = 'id';
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'id',
+        'name',
+        'image_url',
+        'description'
+    ];
+
 
 }
