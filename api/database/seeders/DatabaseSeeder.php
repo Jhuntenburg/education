@@ -8,16 +8,18 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
+    public function __construct(
+        private readonly CardSeeder $cardSeeder
+    )
+    {
+    }
+
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        User::factory()->create();
+        $this->cardSeeder->run();
     }
 }

@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Card extends Model
 {
-    protected $table = 'CARD';
-    protected $primaryKey = 'id';
-
-    public $timestamps = false;
+    use HasFactory;
 
     protected $fillable = [
         'id',
@@ -17,6 +15,4 @@ class Card extends Model
         'image_url',
         'description'
     ];
-
-
 }

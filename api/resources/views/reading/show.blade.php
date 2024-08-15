@@ -57,7 +57,8 @@
     </div>
     <div class="reading-text">
         <p><strong>Question:</strong> {{ $question }}</p>
-        <p><strong>Reading:</strong> {{ $reading }}</p>
+        <p><strong>Reading:</strong></p>
+        <p>{!! nl2br(e($reading)) !!}</p>
     </div>
 </div>
 </body>
