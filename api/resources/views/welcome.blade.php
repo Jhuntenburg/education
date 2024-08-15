@@ -96,6 +96,53 @@
         #random-card-button:hover {
             background-color: #0056b3;
         }
+
+        .reading-container {
+    margin-top: 50px; /* Add space between the div above */
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.question-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.question-container label {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.question-container input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    word-wrap: break-word; /* Allow text to wrap to a new line */
+}
+
+.question-container button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.question-container button:hover {
+    background-color: #0056b3;
+}
     </style>
 </head>
 <body>
@@ -120,6 +167,17 @@
 </div>
 <div>
     <button id="random-card-button" onclick=generateRandomCard()>Pull A Card</button>
+</div>
+<div class="reading-container">
+
+    <form action="/generate-reading" method="POST">
+        @csrf
+        <div class="question-container">
+            <label for="question">Ask your question:</label>
+            <input type="text" id="question" name="question" required>
+            <button type="submit">Get Reading</button>
+        </div>
+    </form>
 </div>
 
 <script>
