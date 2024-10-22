@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Genius Garden Tarot</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -144,6 +145,43 @@
     background-color: #0056b3;
 }
     </style>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+
 </head>
 <body>
 <div class="welcome-container">
@@ -175,13 +213,35 @@
         <div class="question-container">
             <label for="question">Ask your question:</label>
             <input type="text" id="question" name="question" required>
-            <button type="submit">Get Reading</button>
+            <button id="getReadingButton">Get Reading</button>
         </div>
     </form>
 </div>
 
+{{--user modal--}}
+<div id="userModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Enter Your Information</h2>
+        <form id="userForm">
+            @csrf
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+
+
 <script>
+
+
+
     document.addEventListener('DOMContentLoaded', function() {
+
         // Fetch card names via AJAX and populate the dropdown
         fetch('/get-card-names')
             .then(response => response.json())
@@ -195,17 +255,6 @@
                 });
             });
 
-        // Implement search functionality
-        // const searchBox = document.getElementById('search-box');
-        // searchBox.addEventListener('input', function() {
-        //     const filter = searchBox.value.toLowerCase();
-        //     const options = document.getElementById('card-selector').options;
-        //
-        //     for (let i = 1; i < options.length; i++) { // Start at 1 to skip "Select a card..." option
-        //         const text = options[i].textContent.toLowerCase();
-        //         options[i].style.display = text.includes(filter) ? '' : 'none';
-        //     }
-        // });
 
         const cardSelector = document.getElementById('card-selector');
         const viewCardButton = document.getElementById('view-card-button');
@@ -227,6 +276,63 @@
         const randomCardId = Math.floor(Math.random() * 78) + 1;
         window.location.href = '/card/' + randomCardId;
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var modal = document.getElementById('userModal');
+        var btn = document.getElementById('getReadingButton');
+        var span = document.getElementsByClassName('close')[0];
+        var form = document.getElementById('userForm');
+        var questionForm = document.querySelector('form[action="/generate-reading"]'); // Select the reading form
+
+        // Show the modal when the Get Reading button is clicked
+        btn.onclick = function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            modal.style.display = 'block';
+        }
+
+        // Close the modal when the close button is clicked
+        span.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        // Close the modal if the user clicks outside of it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Handle the form submission inside the modal
+        form.onsubmit = function(event) {
+            event.preventDefault();
+
+            var name = document.getElementById('name').value;
+            var email = document.getElementById('email').value;
+            const password = 'testing123';
+
+
+            // Send an AJAX request to save user data
+            fetch('/save-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({name: name, email: email, password: password})
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Close the modal after successful user data submission
+                        modal.style.display = 'none';
+
+                        // Now submit the question form to generate the reading
+                        questionForm.submit();
+                    } else {
+                        alert('There was an error saving your information. Please try again.');
+                    }
+                });
+        }
+    });
 </script>
 </body>
 </html>

@@ -20,10 +20,10 @@ class ReadingController extends Controller
         $question = $request->input('question');
 
         // Randomly select 3 cards
-        $cards = Card::inRandomOrder()->limit(3)->get();
+        $cards = Card::whereBetween('id', [1, 78])->inRandomOrder()->limit(3)->get();
 
         // Prepare the input for ChatGPT
-        $prompt = "Question: {$question}\n\n take the following cards and write a Tarot reading based on them:\n\n";
+        $prompt = "Question: {$question}\n\n take the following cards and write a Tarot reading based on them, refer to the user as 'Beauty' if addressing them directly:\n\n";
 
 
         foreach ($cards as $index => $card) {
@@ -33,18 +33,19 @@ class ReadingController extends Controller
 Log::info($prompt);
         // Send the prompt to ChatGPT
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . "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",
+            'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
         ])->post('https://api.openai.com/v1/chat/completions', [
-            'model' => 'gpt-3.5-turbo', // Update the model here
+            'model' => 'gpt-3.5-turbo-0125', // Update the model here
             'messages' => [
                 ['role' => 'system', 'content' => 'You are a tarot reading expert.'],
                 ['role' => 'user', 'content' => $prompt],
             ],
-            'max_tokens' => 600,
+            'max_tokens' => 500,
         ]);
 
-Log::info(env('OPENAI_API_KEY'));
-        Log::info('OpenAI API Response:', $response->json());
+        Log::info('APIKEY'.env('OPENAI_API_KEY'));
+        Log::info('ENV' . config('app.env'));
+
         $responseData = $response->json();
         Log::info('OpenAI API Response:', $responseData);
 
